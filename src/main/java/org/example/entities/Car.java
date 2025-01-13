@@ -61,16 +61,15 @@ public class Car {
     public void vehicleDisplayAll(){
         String transmissionDispaly;
         if(this.isAutomatic())
-            transmissionDispaly = "Aut";
+            transmissionDispaly = "Automatic";
         else
-            transmissionDispaly = "Man";
-        System.out.println(this.getLicensePlate() + " |     " + this.getMake() + " " + this.getModel() + "     |   "
-                + this.getVehicleType() + "  |   " + this.getYear().getYear() + "  |      " + transmissionDispaly + "      |   "
-                + this.getGasType() + "   |       " + this.getPricePerDay());
+            transmissionDispaly = "Manual";
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s  | %-12s%n", this.getLicensePlate(),this.getMake() + " " +
+                this.getModel(), this.getVehicleType(), this.getYear().getYear(), transmissionDispaly, this.getGasType(), this.getPricePerDay());
     }
 
     public static void carTableHeader(){
-        System.out.println(" Plate  |  Make and Model  |   Type   |   Year  | Transmission  |   Fuel  |  Price per Day");
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s  | %-12s%n",  "Plate","Make and Model", "Type", "Year", "Transmission", "Fuel", "Price per Day");
     }
 
 }

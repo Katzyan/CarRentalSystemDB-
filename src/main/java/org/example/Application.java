@@ -2,26 +2,31 @@ package org.example;
 
 import org.example.entities.Accounts;
 import org.example.entities.Car;
+import org.example.entities.Driver;
 import org.example.enums.GasType;
 import org.example.enums.VehicleType;
 import org.example.repositories.AccountsRepository;
 import org.example.repositories.CarRepository;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.Scanner;
 
+import static org.example.entities.Accounts.accountsTableHeader;
 import static org.example.entities.Car.carTableHeader;
 
 public class Application {
     public static void appStart() {
         //root admin addition
 //        Accounts root = new Accounts();
+//        Driver driver = new Driver();
 //        AccountsRepository accountsRepository = new AccountsRepository();
 //        root.setUsername("root");
 //        root.setPassword("rootPassword");
 //        root.setAdmin(true);
+//        driver.setName("Tudor");
+//        driver.setLicenseNumber("TCM01");
+//        root.setDriver(driver);
+//        driver.setAccounts(root);
 //        accountsRepository.saveAccount(root);
 
 
@@ -32,71 +37,35 @@ public class Application {
             int mainMenuOption = scannerInt.nextInt();
 
             switch (mainMenuOption) {
-                case 1:// Log In
+                case 1:
                 {
-                    displayLogInMenu();
-
-                    int adminMenuOption = scannerInt.nextInt();
-
-                    switch (adminMenuOption) {
-                        case 1: // admin log in
-                        {
-                            if (logInByUsername()) {
-                                //admin is logged in
-                                boolean menu = true;
-                                while (menu) { // stays in loop until Back option
-                                    displayLoggedInAdminMenu();
-                                    int optionAdmin = scannerInt.nextInt();
-                                    switch (optionAdmin) {
-                                        case 1:
-                                            addCarDB();
-                                            break;
-                                        case 2:
-                                            deleteCarDB();
-                                            break;
-                                        case 3:
-                                            updateCarDB();
-                                            break;
-                                        case 4:
-                                            displayAllVehicleByCriteriaDB();
-                                            break;
-                                        case 5: // add another admin
-
-                                            break;
-                                        case 6: { // GO BACK
-                                            menu = false;
-                                            break;
-                                        }
-                                        case 0:
-                                            System.exit(0);
-                                    }
-                                }
+                    Accounts account = accountSelection();
+                    if (account == null) {
+                        System.out.println("Username does not exist");
+                    } else {
+                        if (logInByUsername(account)) {
+                            if (account.isAdmin()) {
+                               adminMenu();
+                            } else {
+                                userMenu();
                             }
                         }
-
-                        case 2:
-                            break;
-                        case 0:
-                            System.exit(0);
                     }
                     break;
                 }
-
-                case 2: // starting user menu
-                    System.out.println("User menu");
+                case 2:
+                    addAccount(false);
                     break;
                 case 0:
                     System.exit(0);
-
             }
         }
-
-
     }
 
 
-    // Menu Displays
-
+    /**
+     * Display Menu
+     */
     public static void displayMainMenu() {
         System.out.println("Rent a car App");
         System.out.println("-------------------");
@@ -105,46 +74,149 @@ public class Application {
         System.out.println("\n0. Exit");
     }
 
-    public static void displayLogInMenu() {
-        System.out.println("Admin menu ");
-        System.out.println("-------------------");
-        System.out.println("1. Log In");
-        System.out.println("2. Go back");
-        System.out.println("\n0. Exit");
-    }
-
     public static void displayLoggedInAdminMenu() {
         System.out.println("Admin menu ");
         System.out.println("-------------------");
-        System.out.println("1. Add car");
-        System.out.println("2. Delete car");
-        System.out.println("3. Update car");
-        System.out.println("4. Display all vehicles");
-        System.out.println("5. Accounts");
-        System.out.println("6. Go back");
+        System.out.println("1. Fleet");
+        System.out.println("2. Fleet Maintenance - COMING SOON");
+        System.out.println("3. Accounts");
+        System.out.println("4. Reservations - COMING SOON");
+        System.out.println("5. Go back");
         System.out.println("\n0. Exit");
     }
 
-    public static void displayAdminAccountsMenu(){
+    public static void displayAdminAccountsMenu() {
         System.out.println("Admin Menu / Accounts");
         System.out.println("-------------------");
         System.out.println("1. View");
         System.out.println("2. Add");
         System.out.println("3. Delete");
         System.out.println("4. Switch Role");
-        System.out.println("5. Back");
+        System.out.println("5. Change Password");
+        System.out.println("6. Back");
         System.out.println("\n0. Exit ");
     }
 
+    public static void displayAdminFleetMenu() {
+        System.out.println("Admin Menu / Fleet");
+        System.out.println("1. Add car");
+        System.out.println("2. Delete car");
+        System.out.println("3. Update car");
+        System.out.println("4. Display all vehicles");
+        System.out.println("5. Go Back");
+        System.out.println("\n0. Exit");
+    }
 
-    // Log Ins
-    public static boolean logInByUsername() {
+    public static void displayLoggedInUserMenu(){
+        System.out.println("Menu");
+        System.out.println("-------------------");
+        System.out.println("1. Search for a vehicle");
+        System.out.println("2. Make a reservation");
+
+
+    }
+
+
+    /**
+     * Menu
+     */
+    public static void adminMenu(){
+        Scanner scannerInt = new Scanner(System.in);
+        boolean adminMenu = true;
+        while (adminMenu) { // stays in loop until Back option
+            displayLoggedInAdminMenu();
+            int optionAdmin = scannerInt.nextInt();
+            switch (optionAdmin) {
+                case 1:
+                    //  FLEET MENU
+                    boolean fleetMenu = true;
+                    while (fleetMenu) {
+                        displayAdminFleetMenu();
+                        int fleetMenuOption = scannerInt.nextInt();
+                        switch (fleetMenuOption) {
+                            case 1:
+                                addCarDB();
+                                break;
+                            case 2:
+                                deleteCarDB();
+                                break;
+                            case 3:
+                                updateCarDB();
+                                break;
+                            case 4:
+                                displayAllVehicleByCriteriaDB();
+                                break;
+                            case 5:
+                                fleetMenu = false;
+                                break;
+                            case 0:
+                                System.exit(0);
+                        }
+                    }
+                    break;
+                case 2:
+                    //FLEET MAINTENANCE
+                    System.out.println("Here we`ll have fleet maintenance");
+                    break;
+                case 3:
+                    //   ACCOUNT MENU
+                    boolean accountMenu = true;
+                    while (accountMenu) {
+                        displayAdminAccountsMenu();
+                        int optionAdminAccounts = scannerInt.nextInt();
+                        switch (optionAdminAccounts) {
+                            case 1:
+                                viewAccountsDB();
+                                break;
+                            case 2:
+                                addAccountsDB();
+                                break;
+                            case 3:
+                                deleteAccountsDB();
+                                break;
+                            case 4:
+                                switchOptionAccountsDB();
+                                break;
+                            case 5:
+                                changePasswordDB();
+                                break;
+                            case 6:
+                                accountMenu = false;
+                                break;
+                            case 0:
+                                System.exit(0);
+                        }
+                    }
+                    break;
+
+                case 4:
+                    //RESERVATIONS
+                    System.out.println("Here we`ll have reservations menu ");
+                    break;
+                case 5: { // GO BACK
+                    adminMenu = false;
+                    break;
+                }
+                case 0:
+                    System.exit(0);
+            }
+        }
+    }
+
+    public static void userMenu(){
+        Scanner scannerInt = new Scanner(System.in);
+        boolean userMenu = true;
+        while (userMenu){
+            System.out.println("Menu ");
+        }
+    }
+
+
+/**
+    Log In and account selection
+ */
+    public static boolean logInByUsername(Accounts account) {
         Scanner scannerString = new Scanner(System.in);
-        System.out.println("Username:");
-        String username = scannerString.next();
-
-        AccountsRepository accountsRepository = new AccountsRepository();
-        Accounts account = accountsRepository.getAccountByUsername(username);
 
         if (account == null) {
             System.out.println("username doesn`t exist");
@@ -161,8 +233,19 @@ public class Application {
         return false;
     }
 
-    // Car operations
+    public static Accounts accountSelection() {
+        Scanner scannerString = new Scanner(System.in);
+        System.out.println("Username:");
+        String username = scannerString.next();
 
+        AccountsRepository accountsRepository = new AccountsRepository();
+        return accountsRepository.getAccountByUsername(username);
+    }
+
+
+        /**
+        Car operations
+         */
     public static void addCarDB() {
         Scanner scannerInt = new Scanner(System.in);
         Scanner scannerString = new Scanner(System.in);
@@ -553,7 +636,7 @@ public class Application {
             while (filterType <= 0 || filterType > 4) {
                 filterType = scannerInt.nextInt();
             }
-            switch (filterType){
+            switch (filterType) {
                 case 1:
                     displayByVehicleType();
                     break;
@@ -567,7 +650,7 @@ public class Application {
         }
     }
 
-    public static void displayByVehicleType(){
+    public static void displayByVehicleType() {
         Scanner scannerInt = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
         System.out.println("Choose the vehicle type you would like to see:");
@@ -577,47 +660,47 @@ public class Application {
         while (vehicleType <= 0 || vehicleType > 10) {
             vehicleType = scannerInt.nextInt();
         }
-        switch (vehicleType){
+        switch (vehicleType) {
             case 1:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.MICRO).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.MICRO).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 2:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.HATCHBACK).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.HATCHBACK).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 3:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.SEDAN).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.SEDAN).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 4:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.COMBI).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.COMBI).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 5:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.PICKUP).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.PICKUP).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 6:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.VAN).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.VAN).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 7:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.SUV).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.SUV).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 8:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.SPORT).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.SPORT).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 9:
                 carTableHeader();
-                carRepository.getCarsByVehicleType(VehicleType.LUXURY).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByVehicleType(VehicleType.LUXURY).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
         }
     }
 
-    public static void displayByVehicleTransmission(){
+    public static void displayByVehicleTransmission() {
         Scanner scannerInt = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
         System.out.println("Choose the transmission type you would like to see:");
@@ -626,19 +709,19 @@ public class Application {
         while (vehicleTransmission <= 0 || vehicleTransmission > 3) {
             vehicleTransmission = scannerInt.nextInt();
         }
-        switch (vehicleTransmission){
+        switch (vehicleTransmission) {
             case 1:
                 carTableHeader();
-                carRepository.getCarsByTransmission(true).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByTransmission(true).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 2:
                 carTableHeader();
-                carRepository.getCarsByTransmission(false).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByTransmission(false).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
         }
     }
 
-    public static void displayByVehicleFuelType(){
+    public static void displayByVehicleFuelType() {
         Scanner scannerInt = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
         System.out.println("Choose the fuel type you would like to see:");
@@ -647,32 +730,157 @@ public class Application {
         while (fuelType <= 0 || fuelType > 6) {
             fuelType = scannerInt.nextInt();
         }
-        switch (fuelType){
+        switch (fuelType) {
             case 1:
                 carTableHeader();
-                carRepository.getCarsByFuelType(GasType.DIESEL).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByFuelType(GasType.DIESEL).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 2:
                 carTableHeader();
-                carRepository.getCarsByFuelType(GasType.GAS).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByFuelType(GasType.GAS).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 3:
                 carTableHeader();
-                carRepository.getCarsByFuelType(GasType.HYBRID).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByFuelType(GasType.HYBRID).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 4:
                 carTableHeader();
-                carRepository.getCarsByFuelType(GasType.HYDROGEN).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByFuelType(GasType.HYDROGEN).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
             case 5:
                 carTableHeader();
-                carRepository.getCarsByFuelType(GasType.ELECTRIC).stream().forEach(car ->car.vehicleDisplayAll());
+                carRepository.getCarsByFuelType(GasType.ELECTRIC).stream().forEach(car -> car.vehicleDisplayAll());
                 break;
         }
     }
 
-    // Account Operations
 
+    /**
+    Account Operations
+     */
+    public static void viewAccountsDB() {
+        Scanner scannerInt = new Scanner(System.in);
+        System.out.println("View: ");
+        System.out.println("1. All accounts\n2. Admin accounts\n3. User Accounts");
+        int viewAccountsOption = scannerInt.nextInt();
+        AccountsRepository accountsRepository = new AccountsRepository();
+        switch (viewAccountsOption) {
+            case 1:
+                accountsTableHeader();
+                accountsRepository.getAllAccounts().stream().forEach(acc -> acc.viewAllAccounts());
+                break;
+            case 2:
+                accountsTableHeader();
+                accountsRepository.getAdminAccounts().stream().forEach(acc -> acc.viewAllAccounts());
+                break;
+            case 3:
+                accountsTableHeader();
+                accountsRepository.getUserAccounts().stream().forEach(acc -> acc.viewAllAccounts());
+                break;
+            // RESUME FROM HERE
+        }
+    }
+
+    public static void addAccountsDB() {
+        Scanner scannerInt = new Scanner(System.in);
+        System.out.println("Would you like to add an admin or user?");
+        System.out.println("1. Admin       2. User ");
+        int adminOrUser = scannerInt.nextInt();
+        switch (adminOrUser) {
+            case 1:
+                addAccount(true);
+                break;
+            case 2:
+                addAccount(false);
+                break;
+            default:
+                System.out.println("Invalid option");
+
+        }
+    }
+
+    public static void deleteAccountsDB() {
+        Scanner scannerString = new Scanner(System.in);
+        AccountsRepository accountsRepository = new AccountsRepository();
+        System.out.println("Enter the username of the account you would like to delete: ");
+        String usernameDeletion = scannerString.nextLine();
+        Accounts account = accountsRepository.getAccountByUsername(usernameDeletion);
+        if (account != null) {
+            accountsRepository.deleteAccount(account);
+            System.out.println("Account deleted successfully!");
+        } else {
+            System.out.println("Could not find account with username " + usernameDeletion);
+        }
+    }
+
+    public static void switchOptionAccountsDB() {
+        Scanner scannerString = new Scanner(System.in);
+        AccountsRepository accountsRepository = new AccountsRepository();
+        System.out.println("Enter the username of the account that you would like to switch the permissions for:");
+        String usernameSwitch = scannerString.nextLine();
+        Accounts account = accountsRepository.getAccountByUsername(usernameSwitch);
+        if (account != null) {
+            account.setAdmin(!account.isAdmin());
+            accountsRepository.updateAccount(account);
+        } else {
+            System.out.println("Could not find account with username " + usernameSwitch);
+        }
+    }
+
+    public static void changePasswordDB() {
+        Scanner scannerString = new Scanner(System.in);
+        AccountsRepository accountsRepository = new AccountsRepository();
+        System.out.println("Enter the username of the account that you would like to change the password for:");
+        String usernamePRes = scannerString.nextLine();
+        Accounts account = accountsRepository.getAccountByUsername(usernamePRes);
+        if (account != null) {
+            System.out.println("Enter the new password");
+            String newPassword = scannerString.nextLine();
+            account.setPassword(newPassword);
+            accountsRepository.updateAccount(account);
+        } else {
+            System.out.println("Could not find account with username " + usernamePRes);
+        }
+
+    }
+
+    public static void addAccount(boolean isAdmin) {
+        Scanner scannerString = new Scanner(System.in);
+        System.out.println("Please enter the username:");
+        String username = scannerString.nextLine();
+
+        AccountsRepository accountsRepository = new AccountsRepository();
+        Accounts account;
+
+        while (true) {
+            account = accountsRepository.getAccountByUsername(username);
+            if (account == null) {
+                break;
+            }
+            System.out.println("Username already exists. Please enter a different username:");
+            username = scannerString.nextLine();
+        }
+        System.out.println("Please enter the password:");
+        String password = scannerString.nextLine();
+        System.out.println("Please enter your full name:");
+        String name = scannerString.nextLine();
+        System.out.println("Please enter your driver license`s number");
+        String licenseNumber = scannerString.nextLine();
+
+        Driver driver = new Driver();
+        account = new Accounts();
+
+        driver.setName(name);
+        driver.setLicenseNumber(licenseNumber);
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setAdmin(isAdmin);
+        account.setDriver(driver);
+        driver.setAccounts(account);
+        accountsRepository.saveAccount(account);
+        System.out.println("Account created successfully");
+
+    }
 
 
 }

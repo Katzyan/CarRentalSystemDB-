@@ -8,8 +8,6 @@ import static org.example.entities.Car.carTableHeader;
 
 public class Main {
     public static void main(String[] args) {
-
         appStart();
-
     }
 }

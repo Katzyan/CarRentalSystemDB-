@@ -21,5 +21,24 @@ public class Accounts {
     @Column(nullable = false)
     private boolean isAdmin;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
+
+    public void viewAllAccounts(){
+       String admin;
+        if(this.isAdmin){
+            admin = "Y";
+        } else {
+            admin = "N";
+        }
+        System.out.printf("%-10s | %-15s | %-10s | %-5s%n",this.getDriver().getName(), this.getDriver().getLicenseNumber(),
+                this.getUsername(), admin);
+
+    }
+    public static void accountsTableHeader(){
+        System.out.printf("%-10s | %-15s | %-10s | %-5s%n", "Name", "License Number", "Username", "Admin");
+    }
+
 
 }
