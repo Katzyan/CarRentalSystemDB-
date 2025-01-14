@@ -3,16 +3,24 @@ package org.example;
 import org.example.entities.Accounts;
 import org.example.entities.Car;
 import org.example.entities.Driver;
+import org.example.entities.Reservation;
 import org.example.enums.GasType;
 import org.example.enums.VehicleType;
 import org.example.repositories.AccountsRepository;
 import org.example.repositories.CarRepository;
+import org.example.repositories.DriverRepository;
+import org.example.repositories.ReservationRepository;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static org.example.entities.Accounts.accountsTableHeader;
 import static org.example.entities.Car.carTableHeader;
+import static org.example.entities.Reservation.showAllReservations;
 
 public class Application {
     public static void appStart() {
@@ -31,23 +39,21 @@ public class Application {
 
 
         Scanner scannerInt = new Scanner(System.in);
-        Scanner scannerString = new Scanner(System.in);
         while (true) {
             displayMainMenu();
             int mainMenuOption = scannerInt.nextInt();
 
             switch (mainMenuOption) {
-                case 1:
-                {
+                case 1: {
                     Accounts account = accountSelection();
                     if (account == null) {
                         System.out.println("Username does not exist");
                     } else {
                         if (logInByUsername(account)) {
                             if (account.isAdmin()) {
-                               adminMenu();
+                                adminMenu();
                             } else {
-                                userMenu();
+                                userMenu(account);
                             }
                         }
                     }
@@ -107,20 +113,42 @@ public class Application {
         System.out.println("\n0. Exit");
     }
 
-    public static void displayLoggedInUserMenu(){
+    public static void displayLoggedInUserMenu() {
         System.out.println("Menu");
         System.out.println("-------------------");
-        System.out.println("1. Search for a vehicle");
-        System.out.println("2. Make a reservation");
+        System.out.println("1. Vehicles");
+        System.out.println("2. Reservations");
+        System.out.println("3. Back");
+        System.out.println("\n0. Exit");
+    }
 
+    public static void displayUserVehicleMenu() {
+        System.out.println("Menu / Vehicles");
+        System.out.println("-------------------");
+        System.out.println("1. View all vehicles");
+        System.out.println("2. View based on availability");
+        System.out.println("3. View based on price");
+        System.out.println("4. View based on price and availability");
+        System.out.println("5. Back ");
+        System.out.println("\n0. Exit");
+    }
 
+    public static void displayUserReservationsMenu() {
+        System.out.println("Menu / Reservations");
+        System.out.println("-------------------");
+        System.out.println("1. Make new reservation");
+        System.out.println("2. View existing reservations");
+        System.out.println("3. View all reservations");
+        System.out.println("4. Cancel a reservation");
+        System.out.println("5. Back");
+        System.out.println("\n0. Exit");
     }
 
 
     /**
      * Menu
      */
-    public static void adminMenu(){
+    public static void adminMenu() {
         Scanner scannerInt = new Scanner(System.in);
         boolean adminMenu = true;
         while (adminMenu) { // stays in loop until Back option
@@ -203,18 +231,176 @@ public class Application {
         }
     }
 
-    public static void userMenu(){
+    public static void userMenu(Accounts account) {
         Scanner scannerInt = new Scanner(System.in);
+        Scanner scannerString = new Scanner(System.in);
         boolean userMenu = true;
-        while (userMenu){
-            System.out.println("Menu ");
+        while (userMenu) {
+            displayLoggedInUserMenu();
+            int userMenuOption = scannerInt.nextInt();
+            switch (userMenuOption) {
+                case 1:
+                    boolean userVehicleMenu = true;
+                    int userVehicleOption;
+                    while (userVehicleMenu) {
+                        displayUserVehicleMenu();
+                        userVehicleOption = scannerInt.nextInt();
+                        switch (userVehicleOption) {
+                            case 1:
+                                displayAllVehicles();
+                                break;
+                            case 2:
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserveFromString = scannerString.nextLine();
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserverToString = scannerString.nextLine();
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                                LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
+                                LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
+
+                                displayVehicleBasedOnAvailability(reserveFromDate, reserveToDate);
+                                break;
+                            case 3:
+                                System.out.println("Enter the minimum price per day");
+                                int priceMin = scannerInt.nextInt();
+                                System.out.println("Enter the maximum price per day");
+                                int priceMax = scannerInt.nextInt();
+                                displayVehicleBasedOnPrice(priceMin, priceMax);
+                                break;
+                            case 4:
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserveFromStringc4 = scannerString.nextLine();
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserverToStringc4 = scannerString.nextLine();
+                                System.out.println("Enter the minimum price per day");
+                                int priceMinc4 = scannerInt.nextInt();
+                                System.out.println("Enter the maximum price per day");
+                                int priceMaxc4 = scannerInt.nextInt();
+                                DateTimeFormatter formatterc4 = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                                LocalDate reserveFromDatec4 = LocalDate.parse(reserveFromStringc4, formatterc4);
+                                LocalDate reserveToDatec4 = LocalDate.parse(reserverToStringc4, formatterc4);
+                                displayVehicleBasedOnPriceAndAvailability(reserveFromDatec4, reserveToDatec4, priceMinc4, priceMaxc4);
+                                break;
+                            case 5:
+                                userVehicleMenu = false;
+                                break;
+                            case 0:
+                                System.exit(0);
+                        }
+                    }
+
+                    break;
+                case 2:
+                    boolean userReservationsMenu = true;
+                    int userReservationsOption;
+
+
+                    while (userReservationsMenu) {
+                        displayUserReservationsMenu();
+                        userReservationsOption = scannerInt.nextInt();
+                        switch (userReservationsOption) {
+                            case 1: //Make new reservation
+                                System.out.println("Please enter the license plate of the car you want to book:");
+                                String licensePlate = scannerString.nextLine();
+                                CarRepository carRepository = new CarRepository();
+                                Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
+                                if(car == null){
+                                    System.out.println("Could not find the mentioned license plate in the database");
+                                    break;
+                                }
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserveFromString = scannerString.nextLine();
+                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+                                String reserverToString = scannerString.nextLine();
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                                LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
+                                LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
+
+                                boolean isAvailable = true;
+                                List<Reservation> reservations = car.getReservations();
+                                for(Reservation reservation : reservations){
+                                    if (!(reservation.getReservedTo().isBefore(reserveFromDate) || reservation.getReservedFrom().isAfter(reserveToDate))) {
+                                        isAvailable = false;
+                                        break;
+                                    }
+                                }
+                                if(!isAvailable){
+                                    System.out.println("Vehicle is not available for the mentioned time frame.");
+                                    break;
+                                }
+                                else {
+                                    DriverRepository driverRepository = new DriverRepository();
+                                    Reservation reserve = new Reservation();
+                                    reserve.setReservedFrom(reserveFromDate);
+                                    reserve.setReservedTo(reserveToDate);
+                                    reserve.setCar(car);
+
+                                    AccountsRepository accountsRepository = new AccountsRepository();
+                                    Driver driver1 = accountsRepository.getDriverWithFullReservations(account);
+                                    List<Driver> drivers = new ArrayList<>();
+                                    drivers.add(driver1);
+
+                                    System.out.println("Would you like to add another driver?");
+                                    System.out.println("1. Yes     2. No");
+                                    int secondDriver = scannerInt.nextInt();
+                                    if(secondDriver == 1){
+                                        Driver driver2 = new Driver();
+
+
+                                        String name2;
+                                        String licenseNumber2;
+                                        System.out.println("What is the name of the second driver?");
+                                        name2 = scannerString.nextLine();
+                                        System.out.println("What is the second driver`s license number?");
+                                        licenseNumber2 = scannerString.nextLine();
+                                        driver2.setName(name2);
+                                        driver2.setLicenseNumber(licenseNumber2);
+                                        driverRepository.saveDriver(driver2);
+                                        drivers.add(driver2);
+                                    }
+                                    reserve.setDrivers(drivers);
+                                    reservations.add(reserve);
+
+                                    car.setReservations(reservations);
+                                    ReservationRepository reservationRepository = new ReservationRepository();
+                                    reservationRepository.saveReservation(reserve);
+
+                                   List<Reservation> driverReserve =  driver1.getReservations();
+                                   driverReserve.add(reserve);
+                                   driver1.setReservations(driverReserve);
+                                   driverRepository.updateDriver(driver1);
+                                }
+
+                                break;
+                            case 2:
+                                showAllReservations(account);
+                                break;
+                            case 3: //View all reservations
+                                break;
+                            case 4: //Cancel a reservation
+                                break;
+                            case 5:
+                                userReservationsMenu = false;
+                                break;
+                            case 0:
+                                System.exit(0);
+                        }
+
+                    }
+                    break;
+                case 3:
+                    userMenu = false;
+                    break;
+                case 0:
+                    System.exit(0);
+            }
         }
     }
 
 
-/**
-    Log In and account selection
- */
+    /**
+     * Log In and account selection
+     */
     public static boolean logInByUsername(Accounts account) {
         Scanner scannerString = new Scanner(System.in);
 
@@ -243,9 +429,9 @@ public class Application {
     }
 
 
-        /**
-        Car operations
-         */
+    /**
+     * Car operations
+     */
     public static void addCarDB() {
         Scanner scannerInt = new Scanner(System.in);
         Scanner scannerString = new Scanner(System.in);
@@ -616,9 +802,9 @@ public class Application {
         }
     }
 
+
     public static void displayAllVehicleByCriteriaDB() {
         Scanner scannerInt = new Scanner(System.in);
-        Scanner scannerString = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
         System.out.println("Would you like to apply a filter?\n1. Yes    2. No");
         int filter = 0;
@@ -648,6 +834,13 @@ public class Application {
                     break;
             }
         }
+    }
+
+    public static void displayAllVehicles() {
+        CarRepository carRepository = new CarRepository();
+
+        carTableHeader();
+        carRepository.getAllCars().stream().forEach(car -> car.vehicleDisplayAll());
     }
 
     public static void displayByVehicleType() {
@@ -754,9 +947,35 @@ public class Application {
         }
     }
 
+    public static void displayVehicleBasedOnPrice(int priceMin, int priceMax) {
+        CarRepository carRepository = new CarRepository();
+
+        carTableHeader();
+        carRepository.getAllCars().stream().filter(car -> car.getPricePerDay() >= priceMin && car.getPricePerDay() <= priceMax).collect(Collectors.toList())
+                .forEach(car -> car.vehicleDisplayAll());
+
+    }
+
+    public static void displayVehicleBasedOnAvailability(LocalDate reservedFrom, LocalDate reservedUntil) {
+        CarRepository carRepository = new CarRepository();
+
+        carTableHeader();
+        carRepository.getAvailableCars(reservedFrom, reservedUntil).stream().forEach(car -> car.vehicleDisplayAll());
+//                .filter(car -> car.getReservations().stream()
+//                        .filter(reservation -> !(reservation.getReservedTo().isBefore(reservedFrom) || reservation.getReservedFrom().isAfter(reservedUntil)))
+//                        .collect(Collectors.toList()).isEmpty()).collect(Collectors.toList()).forEach(car -> car.vehicleDisplayAll());
+    }
+
+    public static void displayVehicleBasedOnPriceAndAvailability(LocalDate reservedFrom, LocalDate reservedUntil, int priceMin, int priceMax) {
+        CarRepository carRepository = new CarRepository();
+        carTableHeader();
+        carRepository.getAvailableCars(reservedFrom, reservedUntil).stream().filter(car -> car.getPricePerDay() >= priceMin && car.getPricePerDay() <= priceMax).collect(Collectors.toList())
+                .forEach(car -> car.vehicleDisplayAll());
+    }
+
 
     /**
-    Account Operations
+     * Account Operations
      */
     public static void viewAccountsDB() {
         Scanner scannerInt = new Scanner(System.in);

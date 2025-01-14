@@ -2,7 +2,10 @@ package org.example.repositories;
 
 import org.example.entities.Accounts;
 import org.example.entities.Car;
+import org.example.entities.Driver;
+import org.example.entities.Reservation;
 import org.example.util.HibernateUtil;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -72,5 +75,22 @@ public class AccountsRepository {
 
         session.getTransaction().commit();
         session.close();
+    }
+
+    public Driver getDriverWithFullReservations(Accounts account) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        account = (Accounts)session.merge(account);
+        Driver driver = account.getDriver();
+//        driver = (Driver)session.merge(driver);
+        Hibernate.initialize(driver.getReservations());
+       for(Reservation res : driver.getReservations()){
+           Hibernate.initialize(res.getDrivers());
+       }
+
+        session.getTransaction().commit();
+        session.close();
+        return driver;
     }
 }

@@ -39,8 +39,8 @@ public class Car {
 
     private int pricePerDay;
 
-    @OneToMany(mappedBy = "car")
-    private List<Reservation> reservation = new ArrayList<>();
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
+    private List<Reservation> reservations = new ArrayList<>();
 
     public void vehicleDisplay(){
         System.out.println("License plate: " + this.getLicensePlate());
