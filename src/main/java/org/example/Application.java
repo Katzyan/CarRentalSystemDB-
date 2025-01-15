@@ -13,6 +13,7 @@ import org.example.repositories.ReservationRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.example.entities.Accounts.accountsTableHeader;
 import static org.example.entities.Car.carTableHeader;
-import static org.example.entities.Reservation.showAllReservations;
+
 
 public class Application {
     public static void appStart() {
@@ -138,7 +139,7 @@ public class Application {
         System.out.println("-------------------");
         System.out.println("1. Make new reservation");
         System.out.println("2. View existing reservations");
-        System.out.println("3. View all reservations");
+        System.out.println("3. View upcoming reservations");
         System.out.println("4. Cancel a reservation");
         System.out.println("5. Back");
         System.out.println("\n0. Exit");
@@ -288,96 +289,25 @@ public class Application {
                                 System.exit(0);
                         }
                     }
-
                     break;
                 case 2:
                     boolean userReservationsMenu = true;
                     int userReservationsOption;
-
-
                     while (userReservationsMenu) {
                         displayUserReservationsMenu();
                         userReservationsOption = scannerInt.nextInt();
                         switch (userReservationsOption) {
-                            case 1: //Make new reservation
-                                System.out.println("Please enter the license plate of the car you want to book:");
-                                String licensePlate = scannerString.nextLine();
-                                CarRepository carRepository = new CarRepository();
-                                Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
-                                if(car == null){
-                                    System.out.println("Could not find the mentioned license plate in the database");
-                                    break;
-                                }
-                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
-                                String reserveFromString = scannerString.nextLine();
-                                System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
-                                String reserverToString = scannerString.nextLine();
-                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-                                LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
-                                LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
-
-                                boolean isAvailable = true;
-                                List<Reservation> reservations = car.getReservations();
-                                for(Reservation reservation : reservations){
-                                    if (!(reservation.getReservedTo().isBefore(reserveFromDate) || reservation.getReservedFrom().isAfter(reserveToDate))) {
-                                        isAvailable = false;
-                                        break;
-                                    }
-                                }
-                                if(!isAvailable){
-                                    System.out.println("Vehicle is not available for the mentioned time frame.");
-                                    break;
-                                }
-                                else {
-                                    DriverRepository driverRepository = new DriverRepository();
-                                    Reservation reserve = new Reservation();
-                                    reserve.setReservedFrom(reserveFromDate);
-                                    reserve.setReservedTo(reserveToDate);
-                                    reserve.setCar(car);
-
-                                    AccountsRepository accountsRepository = new AccountsRepository();
-                                    Driver driver1 = accountsRepository.getDriverWithFullReservations(account);
-                                    List<Driver> drivers = new ArrayList<>();
-                                    drivers.add(driver1);
-
-                                    System.out.println("Would you like to add another driver?");
-                                    System.out.println("1. Yes     2. No");
-                                    int secondDriver = scannerInt.nextInt();
-                                    if(secondDriver == 1){
-                                        Driver driver2 = new Driver();
-
-
-                                        String name2;
-                                        String licenseNumber2;
-                                        System.out.println("What is the name of the second driver?");
-                                        name2 = scannerString.nextLine();
-                                        System.out.println("What is the second driver`s license number?");
-                                        licenseNumber2 = scannerString.nextLine();
-                                        driver2.setName(name2);
-                                        driver2.setLicenseNumber(licenseNumber2);
-                                        driverRepository.saveDriver(driver2);
-                                        drivers.add(driver2);
-                                    }
-                                    reserve.setDrivers(drivers);
-                                    reservations.add(reserve);
-
-                                    car.setReservations(reservations);
-                                    ReservationRepository reservationRepository = new ReservationRepository();
-                                    reservationRepository.saveReservation(reserve);
-
-                                   List<Reservation> driverReserve =  driver1.getReservations();
-                                   driverReserve.add(reserve);
-                                   driver1.setReservations(driverReserve);
-                                   driverRepository.updateDriver(driver1);
-                                }
-
+                            case 1: //Make new reservation for logged account
+                                makeNewReservation(account);
                                 break;
-                            case 2:
+                            case 2:// show all reservations for logged in account
                                 showAllReservations(account);
                                 break;
-                            case 3: //View all reservations
+                            case 3: //show upcoming reservations for logged in account
+                                showUpcomingReservations(account);
                                 break;
-                            case 4: //Cancel a reservation
+                            case 4: //cancel a reservation
+                                cancelReservation(account);
                                 break;
                             case 5:
                                 userReservationsMenu = false;
@@ -385,10 +315,9 @@ public class Application {
                             case 0:
                                 System.exit(0);
                         }
-
                     }
                     break;
-                case 3:
+                case 3://back
                     userMenu = false;
                     break;
                 case 0:
@@ -1101,6 +1030,241 @@ public class Application {
 
     }
 
+    /**
+     Reservation Operations
+     */
+    public static void showAllReservations(Accounts account){
+        AccountsRepository accountsRepository = new AccountsRepository();
+        Driver driver = accountsRepository.getDriverWithFullReservations(account);
+        List<Reservation> reservs = driver.getReservations();
+        Car car;
+
+        if(reservs == null || reservs.isEmpty()){
+            System.out.println("You have no reservations");
+            return;
+        }
+        reservationsHeader();
+        for(Reservation res: reservs){
+            List<Driver> drivers = res.getDrivers();
+            car = res.getCar();
+
+            if(drivers.size() == 1){
+                System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
+            } else {
+                String driver1 = "N/A";
+                String driver2= "N/A";
+                for(Driver driverForName : drivers){
+                    if(driverForName.getName().equals(driver.getName())){
+                        driver1 = driver.getName();
+                    } else {
+                        driver2 = driverForName.getName();
+                    }
+                }
+                System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver1, driver2);
+            }
+        }
+    }
+
+    public static void reservationsHeader(){
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   |  %-20s  | %-20s%n",
+                "Plate","Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
+    }
+
+    public static void makeNewReservation(Accounts account){
+        Scanner scannerInt = new Scanner(System.in);
+        Scanner scannerString = new Scanner(System.in);
+
+        System.out.println("Please enter the license plate of the car you want to book:");
+        String licensePlate = scannerString.nextLine();
+        CarRepository carRepository = new CarRepository();
+        Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
+        if(car == null){
+            System.out.println("Could not find the mentioned license plate in the database");
+            return;
+        }
+        System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+        String reserveFromString = scannerString.nextLine();
+        System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
+        String reserverToString = scannerString.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
+        LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
+
+        boolean isAvailable = true;
+        List<Reservation> reservations = car.getReservations();
+        for(Reservation reservation : reservations){
+            if (!(reservation.getReservedTo().isBefore(reserveFromDate) || reservation.getReservedFrom().isAfter(reserveToDate))) {
+                isAvailable = false;
+                break;
+            }
+        }
+        if(!isAvailable){
+            System.out.println("Vehicle is not available for the mentioned time frame.");
+        }
+        else {
+            DriverRepository driverRepository = new DriverRepository();
+            Reservation reserve = new Reservation();
+            reserve.setReservedFrom(reserveFromDate);
+            reserve.setReservedTo(reserveToDate);
+            reserve.setCar(car);
+
+            AccountsRepository accountsRepository = new AccountsRepository();
+            Driver driver1 = accountsRepository.getDriverWithFullReservations(account);
+            List<Driver> drivers = new ArrayList<>();
+            drivers.add(driver1);
+
+            System.out.println("Would you like to add another driver?");
+            System.out.println("1. Yes     2. No");
+            int secondDriver = scannerInt.nextInt();
+            if(secondDriver == 1){
+                Driver driver2 = new Driver();
+
+
+                String name2;
+                String licenseNumber2;
+                System.out.println("What is the name of the second driver?");
+                name2 = scannerString.nextLine();
+                System.out.println("What is the second driver`s license number?");
+                licenseNumber2 = scannerString.nextLine();
+                driver2.setName(name2);
+                driver2.setLicenseNumber(licenseNumber2);
+                driverRepository.saveDriver(driver2);
+                drivers.add(driver2);
+            }
+            reserve.setDrivers(drivers);
+            reservations.add(reserve);
+
+            car.setReservations(reservations);
+            ReservationRepository reservationRepository = new ReservationRepository();
+            reservationRepository.saveReservation(reserve);
+
+            List<Reservation> driverReserve =  driver1.getReservations();
+            driverReserve.add(reserve);
+            driver1.setReservations(driverReserve);
+            driverRepository.updateDriver(driver1);
+            System.out.println("Successfully created new reservation");
+        }
+    }
+
+    public static void showUpcomingReservations(Accounts account){
+        AccountsRepository accountsRepository = new AccountsRepository();
+        Driver driver = accountsRepository.getDriverWithFullReservations(account);
+        List<Reservation> reservs = driver.getReservations();
+        if(reservs == null || reservs.isEmpty()){
+            System.out.println("You have no reservations");
+            return;
+        }
+        reservs = reservs.stream().filter(res -> res.getReservedFrom().isAfter(LocalDate.now())).collect(Collectors.toList());
+        if(reservs == null || reservs.isEmpty()){
+            System.out.println("You have no upcoming reservations");
+            return;
+        }
+        Car car;
+
+        reservationsHeader();
+
+        for(Reservation res: reservs){
+            List<Driver> drivers = res.getDrivers();
+            car = res.getCar();
+
+            if(drivers.size() == 1){
+                System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
+            } else {
+                String driver1 = "N/A";
+                String driver2= "N/A";
+                for(Driver driverForName : drivers){
+                    if(driverForName.getName().equals(driver.getName())){
+                        driver1 = driver.getName();
+                    } else {
+                        driver2 = driverForName.getName();
+                    }
+                }
+                System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver1, driver2);
+            }
+        }
+    }
+
+    public static void cancelReservation(Accounts account){
+        Scanner scannerInt = new Scanner(System.in);
+        AccountsRepository accountsRepository = new AccountsRepository();
+        Driver driver = accountsRepository.getDriverWithFullReservations(account);
+        List<Reservation> reservs = driver.getReservations();
+        if(reservs == null || reservs.isEmpty()){
+            System.out.println("You have no reservations");
+            return;
+        }
+        reservs = reservs.stream().filter(res -> res.getReservedFrom().isAfter(LocalDate.now())).toList();
+        if(reservs.isEmpty()){
+            System.out.println("You have no upcoming reservations");
+            return;
+        }
+        Car car;
+        System.out.printf("%-6s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   |  %-20s  | %-20s%n",
+                "Res ID","Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
+        for(Reservation res: reservs){
+            List<Driver> drivers = res.getDrivers();
+            car = res.getCar();
+            if(drivers.size() == 1){
+                System.out.printf("%-6s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        res.getId(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
+            } else {
+                String driver1 = "N/A";
+                String driver2= "N/A";
+                for(Driver driverForName : drivers){
+                    if(driverForName.getName().equals(driver.getName())){
+                        driver1 = driver.getName();
+                    } else {
+                        driver2 = driverForName.getName();
+                    }
+                }
+                System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
+                        car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
+                        ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver1, driver2);
+            }
+        }
+        System.out.println("Enter the ID of the reservation that you want to cancel: ");
+        int reservationID = scannerInt.nextInt();
+
+        Reservation reservCancel = null;
+        for(Reservation res: reservs){
+            if(res.getId() == reservationID){
+                reservCancel = res;
+                break;
+            }
+        }
+        if(reservCancel == null){
+            System.out.println("Unable to find reservation. Please try again");
+            return;
+        }
+
+        List<Reservation> mutableReservs = new ArrayList<>(driver.getReservations());
+        mutableReservs.remove(reservCancel);
+
+        ReservationRepository reservationRepository = new ReservationRepository();
+        reservationRepository.deleteReservation(reservCancel);
+
+        Car carCancelRes = reservCancel.getCar();
+        carCancelRes.setReservations(mutableReservs);
+        CarRepository carRepository = new CarRepository();
+        carRepository.updateCar(carCancelRes);
+
+        driver.setReservations(mutableReservs);
+        DriverRepository driverRepository = new DriverRepository();
+        driverRepository.updateDriver(driver);
+
+        account.setDriver(driver);
+        accountsRepository.updateAccount(account);
+        System.out.println("Reservation successfully canceled");
+    }
 
 }
 

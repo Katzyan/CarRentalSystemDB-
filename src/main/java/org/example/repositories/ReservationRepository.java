@@ -1,5 +1,6 @@
 package org.example.repositories;
 
+import org.example.entities.Car;
 import org.example.entities.Driver;
 import org.example.entities.Reservation;
 import org.example.util.HibernateUtil;
@@ -14,6 +15,16 @@ public class ReservationRepository {
         session.beginTransaction();
 
         session.save(reservation);
+
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    public void deleteReservation(Reservation reservation) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        session.delete(reservation);
 
         session.getTransaction().commit();
         session.close();
