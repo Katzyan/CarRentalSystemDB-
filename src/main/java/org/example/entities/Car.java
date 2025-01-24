@@ -42,6 +42,9 @@ public class Car {
     @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
     private List<Reservation> reservations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "car")
+    private List<Maintenance> maintenances = new ArrayList<>();
+
     public void vehicleDisplay(){
         System.out.println("License plate: " + this.getLicensePlate());
         System.out.println("VIN: " + this.getVin());

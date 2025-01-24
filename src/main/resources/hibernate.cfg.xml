@@ -16,5 +16,6 @@
         <mapping class="org.example.entities.Driver"/>
         <mapping class="org.example.entities.Reservation"/>
         <mapping class="org.example.entities.Accounts"/>
+        <mapping class="org.example.entities.Maintenance"/>
     </session-factory>
 </hibernate-configuration>

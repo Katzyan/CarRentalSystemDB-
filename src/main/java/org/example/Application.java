@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -106,6 +107,7 @@ public class Application {
 
     public static void displayAdminFleetMenu() {
         System.out.println("Admin Menu / Fleet");
+        System.out.println("-------------------");
         System.out.println("1. Add car");
         System.out.println("2. Delete car");
         System.out.println("3. Update car");
@@ -141,6 +143,17 @@ public class Application {
         System.out.println("2. View existing reservations");
         System.out.println("3. View upcoming reservations");
         System.out.println("4. Cancel a reservation");
+        System.out.println("5. Back");
+        System.out.println("\n0. Exit");
+    }
+
+    public static void displayAdminMaintenanceMenu(){
+        System.out.println("Admin Menu / Fleet Maintenance");
+        System.out.println("-------------------");
+        System.out.println("1. Schedule car for Maintenance");
+        System.out.println("2. Cancel Maintenance");
+        System.out.println("3. View upcoming Maintenance");
+        System.out.println("4. View all Maintenance");
         System.out.println("5. Back");
         System.out.println("\n0. Exit");
     }
@@ -185,7 +198,26 @@ public class Application {
                     break;
                 case 2:
                     //FLEET MAINTENANCE
-                    System.out.println("Here we`ll have fleet maintenance");
+                    boolean maintenanceMenu = true;
+                    while(maintenanceMenu){
+                        displayAdminMaintenanceMenu();
+                        int maintenanceOption = scannerInt.nextInt();
+                        switch (maintenanceOption){
+                            case 1: // NEW MAINTENCEN
+                                break;
+                            case 2:// CANCEL MAINTENANCE
+                                break;
+                            case 3: //VIEW UPCOMING MAINTENANCE
+                                break;
+                            case 4: // view all maintenance
+                                break;
+                            case 5:
+                                maintenanceMenu = false;
+                                break;
+                            case 0:
+                                System.exit(0);
+                        }
+                    }
                     break;
                 case 3:
                     //   ACCOUNT MENU
@@ -731,7 +763,6 @@ public class Application {
         }
     }
 
-
     public static void displayAllVehicleByCriteriaDB() {
         Scanner scannerInt = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
@@ -1264,6 +1295,52 @@ public class Application {
         account.setDriver(driver);
         accountsRepository.updateAccount(account);
         System.out.println("Reservation successfully canceled");
+    }
+
+
+    /**
+     Maintenance Operations
+     */
+    public static void makeNewMaintenance(){
+        Scanner scannerString = new Scanner(System.in);
+        CarRepository carRepository = new CarRepository();
+
+        System.out.println("Please enter the license plate of the vehicle you would like to schedule for maintenance:");
+        String licensePlate = scannerString.nextLine();
+        Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
+
+        System.out.println("When would you like to start the maintenance? e.g. 2024/01/24");
+        String startMaintenance = scannerString.nextLine();
+        System.out.println("When does the maintenance process end? e.g. 2024/01/24");
+        String endMaintenance = scannerString.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate startMaintenanceDate = LocalDate.parse(startMaintenance, formatter);
+        LocalDate endMaintenanceDate = LocalDate.parse(endMaintenance, formatter);
+
+        boolean isAvailable = true;
+        List<Reservation> reservations = car.getReservations();
+        for(Reservation reservation : reservations){
+            if (!(reservation.getReservedTo().isBefore(startMaintenanceDate) || reservation.getReservedFrom().isAfter(endMaintenanceDate))) {
+                isAvailable = false;
+                break;
+            }
+        }
+        if(!isAvailable){
+            System.out.println("Vehicle has a reservation for that period. Please choose a different period for the maintenance");
+        } else {
+            System.out.println("What will the maintenance be? e.g. Oil Change, Tire change, Inspection etc. ");
+            String maintenance = scannerString.nextLine();
+            List<String> maintenanceList = Arrays.asList(maintenance.split(","));
+            // RESUME HERE - NEED TO SAVE THE MAINTENANCE TO THE DATABSE
+
+
+        }
+
+
+
+
+
+
     }
 
 }
