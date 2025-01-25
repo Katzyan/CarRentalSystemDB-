@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="Maitenance add based on availability&#10;Reservation add based on availability of the Maitenance as well">
+    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="View all maintenance added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repositories/CarRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/CarRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,7 +127,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737801470242</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="View all maintenance added">
+      <option name="closed" value="true" />
+      <created>1737805613621</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737805613621</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -139,7 +145,8 @@
     <MESSAGE value="user: &#10;show upcoming reservations&#10;cancel reservation" />
     <MESSAGE value="adding maintenance records" />
     <MESSAGE value="Maitenance add based on availability&#10;Reservation add based on availability of the Maitenance as well" />
-    <option name="LAST_COMMIT_MESSAGE" value="Maitenance add based on availability&#10;Reservation add based on availability of the Maitenance as well" />
+    <MESSAGE value="View all maintenance added" />
+    <option name="LAST_COMMIT_MESSAGE" value="View all maintenance added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

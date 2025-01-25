@@ -199,10 +199,11 @@ public class Application {
                                 break;
                             case 2:// CANCEL MAINTENANCE
                                 break;
-                            case 3: //VIEW UPCOMING MAINTENANCE
+                            case 3:
+                                showUpcomingMaintenance();
                                 break;
                             case 4:
-                                viewAllMaintenance();
+                                showAllMaintenance();
                                 break;
                             case 5:
                                 maintenanceMenu = false;
@@ -949,6 +950,42 @@ public class Application {
         }
     }
 
+    public static void displayVehicleWithUpcomingMaintenance(Car car){
+        String transmissionDispaly;
+        if(car.isAutomatic())
+            transmissionDispaly = "Automatic";
+        else
+            transmissionDispaly = "Manual";
+
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  "Plate","Make and Model", "Type", "Year", "Transmission", "Fuel");
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  car.getLicensePlate(),car.getMake() + " " +
+                car.getModel(), car.getVehicleType(), car.getYear().getYear(), transmissionDispaly, car.getGasType());
+        System.out.print("Upcoming Maintenance: ");
+        List<Maintenance> maintenanceList = car.getMaintenances();
+        boolean upcomingMaintenance = false;
+        for(Maintenance maintenance: maintenanceList){
+            if(maintenance.getMaintenanceStart().isAfter(LocalDate.now())){
+                upcomingMaintenance = true;
+                break;
+            } else {
+
+            }
+        }
+        if(maintenanceList.isEmpty()){
+            System.out.println("No Maintenance Record.\n");
+        } else if(upcomingMaintenance) {
+            System.out.printf("\n%-10s |  %-10s  |  %-30s%n",  "From","To", "Maintenance Details");
+            for(Maintenance maintenance: maintenanceList){
+                if(maintenance.getMaintenanceStart().isAfter(LocalDate.now())){
+                    System.out.printf("%-10s |  %-10s  |  %-30s%n",  maintenance.getMaintenanceStart(),maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("No Upcoming Maintenance\n");
+        }
+    }
+
 
     /**
      * Account Operations
@@ -1386,14 +1423,24 @@ public class Application {
         }
     }
 
-    public static void viewAllMaintenance(){
-        Scanner scannerString = new Scanner(System.in);
+    public static void showAllMaintenance(){
         MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
         CarRepository carRepository = new CarRepository();
         List<Car> carList = carRepository.getAllCarsWithMaintenance();
         for(Car car : carList){
             if(car != null){
                 displayVehicleWithMaintenance(car);
+            }
+        }
+    }
+
+    public static void showUpcomingMaintenance(){
+        MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
+        CarRepository carRepository = new CarRepository();
+        List<Car> carList = carRepository.getAllCarsWithMaintenance();
+        for(Car car : carList){
+            if(car != null){
+                displayVehicleWithUpcomingMaintenance(car);
             }
         }
     }
