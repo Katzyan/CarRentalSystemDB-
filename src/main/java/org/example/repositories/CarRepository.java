@@ -46,6 +46,19 @@ public class CarRepository {
         return cars;
     }
 
+    public List<Car> getAllCarsWithMaintenance(){
+        Session session = sessionFactory.openSession();
+        String hql = "FROM Car";
+        List<Car> cars = session.createQuery(hql, Car.class).getResultList();
+        for(Car car : cars){
+            if(car != null){
+                Hibernate.initialize(car.getMaintenances());
+            }
+        }
+        session.close();
+        return cars;
+    }
+
     public List<Car> getAvailableCars(LocalDate reservedFrom, LocalDate reservedUntil) {
         Session session = sessionFactory.openSession();
         String hql = "FROM Car";
@@ -55,7 +68,7 @@ public class CarRepository {
         List<Maintenance> maintenances = new ArrayList<>();
         for (Car car : cars) {
             boolean isAvailableReserve = true;
-            boolean isAvailablemaint = true;
+            boolean isAvailableMaint = true;
             reservations = car.getReservations();
             maintenances = car.getMaintenances();
             for (Reservation reservation : reservations) {
@@ -66,11 +79,11 @@ public class CarRepository {
             }
             for(Maintenance maintenance : maintenances){
                 if(!(maintenance.getMaintenanceStart().isBefore(reservedFrom) || maintenance.getMaintenanceEnd().isAfter(reservedUntil))){
-                    isAvailablemaint = false;
+                    isAvailableMaint = false;
                     break;
                 }
             }
-            if (isAvailableReserve && isAvailablemaint) {
+            if (isAvailableReserve && isAvailableMaint) {
                 availableCars.add(car);
             }
         }

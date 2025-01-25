@@ -43,13 +43,20 @@ public class MaintenanceRepository {
             }));
 
         }catch (Exception ignored){
-
         }
+
         session.getTransaction().commit();
         session.close();
         return maintenance;
-
-
     }
+    public List<Maintenance> getAllMaintenance(){
+        Session session = sessionFactory.openSession();
+        String hql = "FROM Maintenance";
+        List<Maintenance> maintenancesList = session.createQuery(hql, Maintenance.class).getResultList();
+        session.close();
+        return maintenancesList;
+    }
+
+
 
 }

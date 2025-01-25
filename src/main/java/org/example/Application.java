@@ -8,10 +8,7 @@ import org.example.repositories.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.entities.Accounts.accountsTableHeader;
@@ -204,7 +201,8 @@ public class Application {
                                 break;
                             case 3: //VIEW UPCOMING MAINTENANCE
                                 break;
-                            case 4: // view all maintenance
+                            case 4:
+                                viewAllMaintenance();
                                 break;
                             case 5:
                                 maintenanceMenu = false;
@@ -928,6 +926,29 @@ public class Application {
                 .forEach(car -> car.vehicleDisplayAll());
     }
 
+    public static void displayVehicleWithMaintenance(Car car){
+        String transmissionDispaly;
+        if(car.isAutomatic())
+            transmissionDispaly = "Automatic";
+        else
+            transmissionDispaly = "Manual";
+
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  "Plate","Make and Model", "Type", "Year", "Transmission", "Fuel");
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  car.getLicensePlate(),car.getMake() + " " +
+                car.getModel(), car.getVehicleType(), car.getYear().getYear(), transmissionDispaly, car.getGasType());
+        System.out.print("Maintenance Record: ");
+        List<Maintenance> maintenanceList = car.getMaintenances();
+        if(maintenanceList.isEmpty()){
+            System.out.println("No Maintenance Record.\n");
+        } else {
+            System.out.printf("\n%-10s |  %-10s  |  %-30s%n",  "From","To", "Maintenance Details");
+            for(Maintenance maintenance: maintenanceList){
+                System.out.printf("%-10s |  %-10s  |  %-30s%n",  maintenance.getMaintenanceStart(),maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
+            }
+            System.out.println();
+        }
+    }
+
 
     /**
      * Account Operations
@@ -1362,6 +1383,18 @@ public class Application {
             car.setMaintenances(carMaintenancesList);
             carRepository.updateCar(car);
             System.out.println("Successfully created new maintenance record ");
+        }
+    }
+
+    public static void viewAllMaintenance(){
+        Scanner scannerString = new Scanner(System.in);
+        MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
+        CarRepository carRepository = new CarRepository();
+        List<Car> carList = carRepository.getAllCarsWithMaintenance();
+        for(Car car : carList){
+            if(car != null){
+                displayVehicleWithMaintenance(car);
+            }
         }
     }
 
