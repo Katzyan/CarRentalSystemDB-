@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="user: &#10;show upcoming reservations&#10;cancel reservation">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/entities/Maintenance.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" afterDir="false" />
+    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="adding maintenance records">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/entities/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/entities/Car.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repositories/CarRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/CarRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736964686518</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="adding maintenance records">
+      <option name="closed" value="true" />
+      <created>1737711536714</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1737711536714</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -124,7 +129,8 @@
     <MESSAGE value="2nd commit" />
     <MESSAGE value="make reservation (1 or 2 drivers) + show all reservations" />
     <MESSAGE value="user: &#10;show upcoming reservations&#10;cancel reservation" />
-    <option name="LAST_COMMIT_MESSAGE" value="user: &#10;show upcoming reservations&#10;cancel reservation" />
+    <MESSAGE value="adding maintenance records" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding maintenance records" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

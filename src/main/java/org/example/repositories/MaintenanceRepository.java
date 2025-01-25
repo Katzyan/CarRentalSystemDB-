@@ -38,7 +38,6 @@ public class MaintenanceRepository {
 
         Maintenance maintenance = session.get(Maintenance.class, id);
         ObjectMapper objectMapper = new ObjectMapper();
-
         try{
             maintenance.setMaintenanceDetailsList(objectMapper.readValue(maintenance.getMaintenanceDetails(), new TypeReference<List<String>>() {
             }));
@@ -46,7 +45,6 @@ public class MaintenanceRepository {
         }catch (Exception ignored){
 
         }
-
         session.getTransaction().commit();
         session.close();
         return maintenance;

@@ -1,6 +1,7 @@
 package org.example.repositories;
 
 import org.example.entities.Car;
+import org.example.entities.Maintenance;
 import org.example.entities.Reservation;
 import org.example.enums.GasType;
 import org.example.enums.VehicleType;
@@ -51,16 +52,25 @@ public class CarRepository {
         List<Car> cars = session.createQuery(hql, Car.class).getResultList();
         List<Car> availableCars = new ArrayList<>();
         List<Reservation> reservations = new ArrayList<>();
+        List<Maintenance> maintenances = new ArrayList<>();
         for (Car car : cars) {
-            boolean isAvailable = true;
+            boolean isAvailableReserve = true;
+            boolean isAvailablemaint = true;
             reservations = car.getReservations();
+            maintenances = car.getMaintenances();
             for (Reservation reservation : reservations) {
                 if (!(reservation.getReservedTo().isBefore(reservedFrom) || reservation.getReservedFrom().isAfter(reservedUntil))) {
-                    isAvailable = false;
+                    isAvailableReserve = false;
                     break;
                 }
             }
-            if (isAvailable) {
+            for(Maintenance maintenance : maintenances){
+                if(!(maintenance.getMaintenanceStart().isBefore(reservedFrom) || maintenance.getMaintenanceEnd().isAfter(reservedUntil))){
+                    isAvailablemaint = false;
+                    break;
+                }
+            }
+            if (isAvailableReserve && isAvailablemaint) {
                 availableCars.add(car);
             }
         }
@@ -75,8 +85,8 @@ public class CarRepository {
                 .uniqueResult();
         if (car != null) {
             Hibernate.initialize(car.getReservations());
+            Hibernate.initialize(car.getMaintenances());
         }
-
         session.close();
         return car;
     }

@@ -1,15 +1,9 @@
 package org.example;
 
-import org.example.entities.Accounts;
-import org.example.entities.Car;
-import org.example.entities.Driver;
-import org.example.entities.Reservation;
+import org.example.entities.*;
 import org.example.enums.GasType;
 import org.example.enums.VehicleType;
-import org.example.repositories.AccountsRepository;
-import org.example.repositories.CarRepository;
-import org.example.repositories.DriverRepository;
-import org.example.repositories.ReservationRepository;
+import org.example.repositories.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -203,7 +197,8 @@ public class Application {
                         displayAdminMaintenanceMenu();
                         int maintenanceOption = scannerInt.nextInt();
                         switch (maintenanceOption){
-                            case 1: // NEW MAINTENCEN
+                            case 1:
+                                makeNewMaintenance();
                                 break;
                             case 2:// CANCEL MAINTENANCE
                                 break;
@@ -1125,15 +1120,25 @@ public class Application {
         LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
         LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
 
-        boolean isAvailable = true;
+        boolean isAvailableReserve = true;
+        boolean isAvailableMaint = true;
         List<Reservation> reservations = car.getReservations();
+        List<Maintenance> maintenances = car.getMaintenances();
         for(Reservation reservation : reservations){
             if (!(reservation.getReservedTo().isBefore(reserveFromDate) || reservation.getReservedFrom().isAfter(reserveToDate))) {
-                isAvailable = false;
+                isAvailableReserve = false;
                 break;
             }
         }
-        if(!isAvailable){
+        for(Maintenance maintenance : maintenances){
+            if(!(maintenance.getMaintenanceStart().isBefore(reserveFromDate) || maintenance.getMaintenanceEnd().isAfter(reserveToDate))){
+                isAvailableMaint = false;
+                break;
+            }
+        }
+        if(!isAvailableReserve){
+            System.out.println("Vehicle is not available for the mentioned time frame.");
+        } else if(!isAvailableMaint){
             System.out.println("Vehicle is not available for the mentioned time frame.");
         }
         else {
@@ -1153,7 +1158,6 @@ public class Application {
             int secondDriver = scannerInt.nextInt();
             if(secondDriver == 1){
                 Driver driver2 = new Driver();
-
 
                 String name2;
                 String licenseNumber2;
@@ -1317,30 +1321,48 @@ public class Application {
         LocalDate startMaintenanceDate = LocalDate.parse(startMaintenance, formatter);
         LocalDate endMaintenanceDate = LocalDate.parse(endMaintenance, formatter);
 
-        boolean isAvailable = true;
+        boolean isAvailableReserver = true;
+        boolean isAvailableMaint = true;
         List<Reservation> reservations = car.getReservations();
+        List<Maintenance> carMaintenanceList = car.getMaintenances();
+
         for(Reservation reservation : reservations){
             if (!(reservation.getReservedTo().isBefore(startMaintenanceDate) || reservation.getReservedFrom().isAfter(endMaintenanceDate))) {
-                isAvailable = false;
+                isAvailableReserver = false;
                 break;
             }
         }
-        if(!isAvailable){
-            System.out.println("Vehicle has a reservation for that period. Please choose a different period for the maintenance");
-        } else {
-            System.out.println("What will the maintenance be? e.g. Oil Change, Tire change, Inspection etc. ");
-            String maintenance = scannerString.nextLine();
-            List<String> maintenanceList = Arrays.asList(maintenance.split(","));
-            // RESUME HERE - NEED TO SAVE THE MAINTENANCE TO THE DATABSE
 
-
+        for(Maintenance maintenance : carMaintenanceList){
+            if(!(maintenance.getMaintenanceStart().isBefore(startMaintenanceDate) || maintenance.getMaintenanceEnd().isAfter(endMaintenanceDate))){
+                isAvailableMaint = false;
+                break;
+            }
         }
 
+        if(!isAvailableReserver ){
+            System.out.println("Vehicle has a reservation for that period. Please choose a different period for the maintenance");
+        } else if (!isAvailableMaint){
+            System.out.println("Vehicle has a maintenance scheduled for that period");
+        }else {
+            System.out.println("What will the maintenance be? e.g. Oil Change, Tire change, Inspection etc. ");
+            String maintenanceOperations = scannerString.nextLine();
+            List<String> maintenanceList = Arrays.asList(maintenanceOperations.split(","));
 
+            Maintenance maintenance = new Maintenance();
+            maintenance.setMaintenanceStart(startMaintenanceDate);
+            maintenance.setMaintenanceEnd(endMaintenanceDate);
+            maintenance.setMaintenanceDetailsList(maintenanceList);
+            maintenance.setCar(car);
+            MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
+            maintenanceRepository.addMaintenanceRepository(maintenance);
 
-
-
-
+            List<Maintenance> carMaintenancesList = car.getMaintenances();
+            carMaintenancesList.add(maintenance);
+            car.setMaintenances(carMaintenancesList);
+            carRepository.updateCar(car);
+            System.out.println("Successfully created new maintenance record ");
+        }
     }
 
 }
