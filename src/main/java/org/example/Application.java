@@ -84,6 +84,28 @@ public class Application {
         System.out.println("\n0. Exit");
     }
 
+    public static void displayAdminFleetMenu() {
+        System.out.println("Admin Menu / Fleet");
+        System.out.println("-------------------");
+        System.out.println("1. Add car");
+        System.out.println("2. Delete car");
+        System.out.println("3. Update car");
+        System.out.println("4. Display all vehicles");
+        System.out.println("5. Go Back");
+        System.out.println("\n0. Exit");
+    }
+
+    public static void displayAdminFleetMaintenanceMenu() {
+        System.out.println("Admin Menu / Fleet Maintenance");
+        System.out.println("-------------------");
+        System.out.println("1. Schedule car for Maintenance");
+        System.out.println("2. Cancel Maintenance");
+        System.out.println("3. View upcoming Maintenance");
+        System.out.println("4. View all Maintenance");
+        System.out.println("5. Back");
+        System.out.println("\n0. Exit");
+    }
+
     public static void displayAdminAccountsMenu() {
         System.out.println("Admin Menu / Accounts");
         System.out.println("-------------------");
@@ -94,17 +116,6 @@ public class Application {
         System.out.println("5. Change Password");
         System.out.println("6. Back");
         System.out.println("\n0. Exit ");
-    }
-
-    public static void displayAdminFleetMenu() {
-        System.out.println("Admin Menu / Fleet");
-        System.out.println("-------------------");
-        System.out.println("1. Add car");
-        System.out.println("2. Delete car");
-        System.out.println("3. Update car");
-        System.out.println("4. Display all vehicles");
-        System.out.println("5. Go Back");
-        System.out.println("\n0. Exit");
     }
 
     public static void displayLoggedInUserMenu() {
@@ -134,17 +145,6 @@ public class Application {
         System.out.println("2. View existing reservations");
         System.out.println("3. View upcoming reservations");
         System.out.println("4. Cancel a reservation");
-        System.out.println("5. Back");
-        System.out.println("\n0. Exit");
-    }
-
-    public static void displayAdminMaintenanceMenu() {
-        System.out.println("Admin Menu / Fleet Maintenance");
-        System.out.println("-------------------");
-        System.out.println("1. Schedule car for Maintenance");
-        System.out.println("2. Cancel Maintenance");
-        System.out.println("3. View upcoming Maintenance");
-        System.out.println("4. View all Maintenance");
         System.out.println("5. Back");
         System.out.println("\n0. Exit");
     }
@@ -191,7 +191,7 @@ public class Application {
                     //FLEET MAINTENANCE
                     boolean maintenanceMenu = true;
                     while (maintenanceMenu) {
-                        displayAdminMaintenanceMenu();
+                        displayAdminFleetMaintenanceMenu();
                         int maintenanceOption = scannerInt.nextInt();
                         switch (maintenanceOption) {
                             case 1:
@@ -1171,13 +1171,22 @@ public class Application {
             System.out.println("Could not find the mentioned license plate in the database");
             return;
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
         String reserveFromString = scannerString.nextLine();
+        LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
+        if(reserveFromDate.isBefore(LocalDate.now())){
+            System.out.println("Unable to create a reservation in the past");
+            return;
+        }
+
         System.out.println("Enter the first day of rental (date format: yyyy/MM/dd e.g. 2024/01/10)");
         String reserverToString = scannerString.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        LocalDate reserveFromDate = LocalDate.parse(reserveFromString, formatter);
         LocalDate reserveToDate = LocalDate.parse(reserverToString, formatter);
+        if(reserveFromDate.isAfter(reserveToDate)){
+            System.out.println("The reservation start date cannot be after the end date. Please enter valid dates.");
+            return;
+        }
 
         boolean isAvailableReserve = true;
         boolean isAvailableMaint = true;
@@ -1370,14 +1379,27 @@ public class Application {
         System.out.println("Please enter the license plate of the vehicle you would like to schedule for maintenance:");
         String licensePlate = scannerString.nextLine();
         Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
+        if(car == null){
+            System.out.println("Vehicle not in database");
+            return;
+        }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         System.out.println("When would you like to start the maintenance? e.g. 2024/01/24");
         String startMaintenance = scannerString.nextLine();
+        LocalDate startMaintenanceDate = LocalDate.parse(startMaintenance, formatter);
+        if(startMaintenanceDate.isBefore(LocalDate.now())){
+            System.out.println("Unable to schedule a maintenance record for the past");
+            return;
+        }
+
         System.out.println("When does the maintenance process end? e.g. 2024/01/24");
         String endMaintenance = scannerString.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        LocalDate startMaintenanceDate = LocalDate.parse(startMaintenance, formatter);
         LocalDate endMaintenanceDate = LocalDate.parse(endMaintenance, formatter);
+        if(startMaintenanceDate.isAfter(endMaintenanceDate)){
+            System.out.println("The Maintenance start date cannot be after the end date. Please enter valid dates.");
+            return;
+        }
 
         boolean isAvailableReserver = true;
         boolean isAvailableMaint = true;
