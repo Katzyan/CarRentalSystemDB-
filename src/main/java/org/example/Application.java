@@ -77,7 +77,7 @@ public class Application {
         System.out.println("Admin menu ");
         System.out.println("-------------------");
         System.out.println("1. Fleet");
-        System.out.println("2. Fleet Maintenance - COMING SOON");
+        System.out.println("2. Fleet Maintenance");
         System.out.println("3. Accounts");
         System.out.println("4. Reservations - COMING SOON");
         System.out.println("5. Go back");
@@ -138,7 +138,7 @@ public class Application {
         System.out.println("\n0. Exit");
     }
 
-    public static void displayAdminMaintenanceMenu(){
+    public static void displayAdminMaintenanceMenu() {
         System.out.println("Admin Menu / Fleet Maintenance");
         System.out.println("-------------------");
         System.out.println("1. Schedule car for Maintenance");
@@ -190,14 +190,15 @@ public class Application {
                 case 2:
                     //FLEET MAINTENANCE
                     boolean maintenanceMenu = true;
-                    while(maintenanceMenu){
+                    while (maintenanceMenu) {
                         displayAdminMaintenanceMenu();
                         int maintenanceOption = scannerInt.nextInt();
-                        switch (maintenanceOption){
+                        switch (maintenanceOption) {
                             case 1:
                                 makeNewMaintenance();
                                 break;
-                            case 2:// CANCEL MAINTENANCE
+                            case 2:
+                                cancelMaintenance();
                                 break;
                             case 3:
                                 showUpcomingMaintenance();
@@ -927,57 +928,57 @@ public class Application {
                 .forEach(car -> car.vehicleDisplayAll());
     }
 
-    public static void displayVehicleWithMaintenance(Car car){
+    public static void displayVehicleWithMaintenance(Car car) {
         String transmissionDispaly;
-        if(car.isAutomatic())
+        if (car.isAutomatic())
             transmissionDispaly = "Automatic";
         else
             transmissionDispaly = "Manual";
 
-        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  "Plate","Make and Model", "Type", "Year", "Transmission", "Fuel");
-        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  car.getLicensePlate(),car.getMake() + " " +
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n", "Plate", "Make and Model", "Type", "Year", "Transmission", "Fuel");
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n", car.getLicensePlate(), car.getMake() + " " +
                 car.getModel(), car.getVehicleType(), car.getYear().getYear(), transmissionDispaly, car.getGasType());
         System.out.print("Maintenance Record: ");
         List<Maintenance> maintenanceList = car.getMaintenances();
-        if(maintenanceList.isEmpty()){
+        if (maintenanceList.isEmpty()) {
             System.out.println("No Maintenance Record.\n");
         } else {
-            System.out.printf("\n%-10s |  %-10s  |  %-30s%n",  "From","To", "Maintenance Details");
-            for(Maintenance maintenance: maintenanceList){
-                System.out.printf("%-10s |  %-10s  |  %-30s%n",  maintenance.getMaintenanceStart(),maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
+            System.out.printf("\n%-10s |  %-10s  |  %-30s%n", "From", "To", "Maintenance Details");
+            for (Maintenance maintenance : maintenanceList) {
+                System.out.printf("%-10s |  %-10s  |  %-30s%n", maintenance.getMaintenanceStart(), maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
             }
             System.out.println();
         }
     }
 
-    public static void displayVehicleWithUpcomingMaintenance(Car car){
+    public static void displayVehicleWithUpcomingMaintenance(Car car) {
         String transmissionDispaly;
-        if(car.isAutomatic())
+        if (car.isAutomatic())
             transmissionDispaly = "Automatic";
         else
             transmissionDispaly = "Manual";
 
-        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  "Plate","Make and Model", "Type", "Year", "Transmission", "Fuel");
-        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n",  car.getLicensePlate(),car.getMake() + " " +
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n", "Plate", "Make and Model", "Type", "Year", "Transmission", "Fuel");
+        System.out.printf("%-10s |  %-20s  |  %-9s  |  %-4s  | %-12s  |  %-8s%n", car.getLicensePlate(), car.getMake() + " " +
                 car.getModel(), car.getVehicleType(), car.getYear().getYear(), transmissionDispaly, car.getGasType());
         System.out.print("Upcoming Maintenance: ");
         List<Maintenance> maintenanceList = car.getMaintenances();
         boolean upcomingMaintenance = false;
-        for(Maintenance maintenance: maintenanceList){
-            if(maintenance.getMaintenanceStart().isAfter(LocalDate.now())){
+        for (Maintenance maintenance : maintenanceList) {
+            if (maintenance.getMaintenanceStart().isAfter(LocalDate.now())) {
                 upcomingMaintenance = true;
                 break;
             } else {
 
             }
         }
-        if(maintenanceList.isEmpty()){
+        if (maintenanceList.isEmpty()) {
             System.out.println("No Maintenance Record.\n");
-        } else if(upcomingMaintenance) {
-            System.out.printf("\n%-10s |  %-10s  |  %-30s%n",  "From","To", "Maintenance Details");
-            for(Maintenance maintenance: maintenanceList){
-                if(maintenance.getMaintenanceStart().isAfter(LocalDate.now())){
-                    System.out.printf("%-10s |  %-10s  |  %-30s%n",  maintenance.getMaintenanceStart(),maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
+        } else if (upcomingMaintenance) {
+            System.out.printf("\n%-10s |  %-10s  |  %-30s%n", "From", "To", "Maintenance Details");
+            for (Maintenance maintenance : maintenanceList) {
+                if (maintenance.getMaintenanceStart().isAfter(LocalDate.now())) {
+                    System.out.printf("%-10s |  %-10s  |  %-30s%n", maintenance.getMaintenanceStart(), maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
                 }
             }
             System.out.println();
@@ -1115,32 +1116,32 @@ public class Application {
     }
 
     /**
-     Reservation Operations
+     * Reservation Operations
      */
-    public static void showAllReservations(Accounts account){
+    public static void showAllReservations(Accounts account) {
         AccountsRepository accountsRepository = new AccountsRepository();
         Driver driver = accountsRepository.getDriverWithFullReservations(account);
         List<Reservation> reservs = driver.getReservations();
         Car car;
 
-        if(reservs == null || reservs.isEmpty()){
+        if (reservs == null || reservs.isEmpty()) {
             System.out.println("You have no reservations");
             return;
         }
         reservationsHeader();
-        for(Reservation res: reservs){
+        for (Reservation res : reservs) {
             List<Driver> drivers = res.getDrivers();
             car = res.getCar();
 
-            if(drivers.size() == 1){
+            if (drivers.size() == 1) {
                 System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
                         car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
                         ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
             } else {
                 String driver1 = "N/A";
-                String driver2= "N/A";
-                for(Driver driverForName : drivers){
-                    if(driverForName.getName().equals(driver.getName())){
+                String driver2 = "N/A";
+                for (Driver driverForName : drivers) {
+                    if (driverForName.getName().equals(driver.getName())) {
                         driver1 = driver.getName();
                     } else {
                         driver2 = driverForName.getName();
@@ -1153,12 +1154,12 @@ public class Application {
         }
     }
 
-    public static void reservationsHeader(){
+    public static void reservationsHeader() {
         System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   |  %-20s  | %-20s%n",
-                "Plate","Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
+                "Plate", "Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
     }
 
-    public static void makeNewReservation(Accounts account){
+    public static void makeNewReservation(Accounts account) {
         Scanner scannerInt = new Scanner(System.in);
         Scanner scannerString = new Scanner(System.in);
 
@@ -1166,7 +1167,7 @@ public class Application {
         String licensePlate = scannerString.nextLine();
         CarRepository carRepository = new CarRepository();
         Car car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
-        if(car == null){
+        if (car == null) {
             System.out.println("Could not find the mentioned license plate in the database");
             return;
         }
@@ -1182,24 +1183,23 @@ public class Application {
         boolean isAvailableMaint = true;
         List<Reservation> reservations = car.getReservations();
         List<Maintenance> maintenances = car.getMaintenances();
-        for(Reservation reservation : reservations){
+        for (Reservation reservation : reservations) {
             if (!(reservation.getReservedTo().isBefore(reserveFromDate) || reservation.getReservedFrom().isAfter(reserveToDate))) {
                 isAvailableReserve = false;
                 break;
             }
         }
-        for(Maintenance maintenance : maintenances){
-            if(!(maintenance.getMaintenanceStart().isBefore(reserveFromDate) || maintenance.getMaintenanceEnd().isAfter(reserveToDate))){
+        for (Maintenance maintenance : maintenances) {
+            if (!(maintenance.getMaintenanceStart().isBefore(reserveFromDate) || maintenance.getMaintenanceEnd().isAfter(reserveToDate))) {
                 isAvailableMaint = false;
                 break;
             }
         }
-        if(!isAvailableReserve){
+        if (!isAvailableReserve) {
             System.out.println("Vehicle is not available for the mentioned time frame.");
-        } else if(!isAvailableMaint){
+        } else if (!isAvailableMaint) {
             System.out.println("Vehicle is not available for the mentioned time frame.");
-        }
-        else {
+        } else {
             DriverRepository driverRepository = new DriverRepository();
             Reservation reserve = new Reservation();
             reserve.setReservedFrom(reserveFromDate);
@@ -1214,7 +1214,7 @@ public class Application {
             System.out.println("Would you like to add another driver?");
             System.out.println("1. Yes     2. No");
             int secondDriver = scannerInt.nextInt();
-            if(secondDriver == 1){
+            if (secondDriver == 1) {
                 Driver driver2 = new Driver();
 
                 String name2;
@@ -1235,7 +1235,7 @@ public class Application {
             ReservationRepository reservationRepository = new ReservationRepository();
             reservationRepository.saveReservation(reserve);
 
-            List<Reservation> driverReserve =  driver1.getReservations();
+            List<Reservation> driverReserve = driver1.getReservations();
             driverReserve.add(reserve);
             driver1.setReservations(driverReserve);
             driverRepository.updateDriver(driver1);
@@ -1243,16 +1243,16 @@ public class Application {
         }
     }
 
-    public static void showUpcomingReservations(Accounts account){
+    public static void showUpcomingReservations(Accounts account) {
         AccountsRepository accountsRepository = new AccountsRepository();
         Driver driver = accountsRepository.getDriverWithFullReservations(account);
         List<Reservation> reservs = driver.getReservations();
-        if(reservs == null || reservs.isEmpty()){
+        if (reservs == null || reservs.isEmpty()) {
             System.out.println("You have no reservations");
             return;
         }
         reservs = reservs.stream().filter(res -> res.getReservedFrom().isAfter(LocalDate.now())).collect(Collectors.toList());
-        if(reservs == null || reservs.isEmpty()){
+        if (reservs == null || reservs.isEmpty()) {
             System.out.println("You have no upcoming reservations");
             return;
         }
@@ -1260,19 +1260,19 @@ public class Application {
 
         reservationsHeader();
 
-        for(Reservation res: reservs){
+        for (Reservation res : reservs) {
             List<Driver> drivers = res.getDrivers();
             car = res.getCar();
 
-            if(drivers.size() == 1){
+            if (drivers.size() == 1) {
                 System.out.printf("%-10s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
                         car.getLicensePlate(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
                         ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
             } else {
                 String driver1 = "N/A";
-                String driver2= "N/A";
-                for(Driver driverForName : drivers){
-                    if(driverForName.getName().equals(driver.getName())){
+                String driver2 = "N/A";
+                for (Driver driverForName : drivers) {
+                    if (driverForName.getName().equals(driver.getName())) {
                         driver1 = driver.getName();
                     } else {
                         driver2 = driverForName.getName();
@@ -1285,35 +1285,35 @@ public class Application {
         }
     }
 
-    public static void cancelReservation(Accounts account){
+    public static void cancelReservation(Accounts account) {
         Scanner scannerInt = new Scanner(System.in);
         AccountsRepository accountsRepository = new AccountsRepository();
         Driver driver = accountsRepository.getDriverWithFullReservations(account);
         List<Reservation> reservs = driver.getReservations();
-        if(reservs == null || reservs.isEmpty()){
+        if (reservs == null || reservs.isEmpty()) {
             System.out.println("You have no reservations");
             return;
         }
         reservs = reservs.stream().filter(res -> res.getReservedFrom().isAfter(LocalDate.now())).toList();
-        if(reservs.isEmpty()){
+        if (reservs.isEmpty()) {
             System.out.println("You have no upcoming reservations");
             return;
         }
         Car car;
         System.out.printf("%-6s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   |  %-20s  | %-20s%n",
-                "Res ID","Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
-        for(Reservation res: reservs){
+                "Res ID", "Make and Model", "Type", "Reserved From", "Reserved To", "Number of Days", "Driver1", "Driver2");
+        for (Reservation res : reservs) {
             List<Driver> drivers = res.getDrivers();
             car = res.getCar();
-            if(drivers.size() == 1){
+            if (drivers.size() == 1) {
                 System.out.printf("%-6s |  %-20s  |  %-9s  |  %-14s  | %-14s  |  %-14s   | %-20s  | %-20s%n",
                         res.getId(), car.getMake() + " " + car.getModel(), car.getVehicleType(), res.getReservedFrom(), res.getReservedTo(),
                         ChronoUnit.DAYS.between(res.getReservedFrom(), res.getReservedTo()), driver.getName(), "N/A");
             } else {
                 String driver1 = "N/A";
-                String driver2= "N/A";
-                for(Driver driverForName : drivers){
-                    if(driverForName.getName().equals(driver.getName())){
+                String driver2 = "N/A";
+                for (Driver driverForName : drivers) {
+                    if (driverForName.getName().equals(driver.getName())) {
                         driver1 = driver.getName();
                     } else {
                         driver2 = driverForName.getName();
@@ -1328,13 +1328,13 @@ public class Application {
         int reservationID = scannerInt.nextInt();
 
         Reservation reservCancel = null;
-        for(Reservation res: reservs){
-            if(res.getId() == reservationID){
+        for (Reservation res : reservs) {
+            if (res.getId() == reservationID) {
                 reservCancel = res;
                 break;
             }
         }
-        if(reservCancel == null){
+        if (reservCancel == null) {
             System.out.println("Unable to find reservation. Please try again");
             return;
         }
@@ -1361,9 +1361,9 @@ public class Application {
 
 
     /**
-     Maintenance Operations
+     * Maintenance Operations
      */
-    public static void makeNewMaintenance(){
+    public static void makeNewMaintenance() {
         Scanner scannerString = new Scanner(System.in);
         CarRepository carRepository = new CarRepository();
 
@@ -1384,25 +1384,25 @@ public class Application {
         List<Reservation> reservations = car.getReservations();
         List<Maintenance> carMaintenanceList = car.getMaintenances();
 
-        for(Reservation reservation : reservations){
+        for (Reservation reservation : reservations) {
             if (!(reservation.getReservedTo().isBefore(startMaintenanceDate) || reservation.getReservedFrom().isAfter(endMaintenanceDate))) {
                 isAvailableReserver = false;
                 break;
             }
         }
 
-        for(Maintenance maintenance : carMaintenanceList){
-            if(!(maintenance.getMaintenanceStart().isBefore(startMaintenanceDate) || maintenance.getMaintenanceEnd().isAfter(endMaintenanceDate))){
+        for (Maintenance maintenance : carMaintenanceList) {
+            if (!(maintenance.getMaintenanceStart().isBefore(startMaintenanceDate) || maintenance.getMaintenanceEnd().isAfter(endMaintenanceDate))) {
                 isAvailableMaint = false;
                 break;
             }
         }
 
-        if(!isAvailableReserver ){
+        if (!isAvailableReserver) {
             System.out.println("Vehicle has a reservation for that period. Please choose a different period for the maintenance");
-        } else if (!isAvailableMaint){
+        } else if (!isAvailableMaint) {
             System.out.println("Vehicle has a maintenance scheduled for that period");
-        }else {
+        } else {
             System.out.println("What will the maintenance be? e.g. Oil Change, Tire change, Inspection etc. ");
             String maintenanceOperations = scannerString.nextLine();
             List<String> maintenanceList = Arrays.asList(maintenanceOperations.split(","));
@@ -1419,29 +1419,85 @@ public class Application {
             carMaintenancesList.add(maintenance);
             car.setMaintenances(carMaintenancesList);
             carRepository.updateCar(car);
-            System.out.println("Successfully created new maintenance record ");
+            System.out.println("Successfully created new maintenance record for " + car.getLicensePlate());
         }
     }
 
-    public static void showAllMaintenance(){
+    public static void showAllMaintenance() {
         MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
         CarRepository carRepository = new CarRepository();
         List<Car> carList = carRepository.getAllCarsWithMaintenance();
-        for(Car car : carList){
-            if(car != null){
+        for (Car car : carList) {
+            if (car != null) {
                 displayVehicleWithMaintenance(car);
             }
         }
     }
 
-    public static void showUpcomingMaintenance(){
+    public static void showUpcomingMaintenance() {
         MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
         CarRepository carRepository = new CarRepository();
         List<Car> carList = carRepository.getAllCarsWithMaintenance();
-        for(Car car : carList){
-            if(car != null){
+        for (Car car : carList) {
+            if (car != null) {
                 displayVehicleWithUpcomingMaintenance(car);
             }
+        }
+    }
+
+    public static void cancelMaintenance() {
+        Scanner scannerString = new Scanner(System.in);
+        Scanner scannerInt = new Scanner(System.in);
+        CarRepository carRepository = new CarRepository();
+        MaintenanceRepository maintenanceRepository = new MaintenanceRepository();
+        List<Maintenance> maintenanceList = new ArrayList<>();
+        Car car = null;
+
+        System.out.println("Please enter the license plate of the vehicle for which you want to cancel the Maintenance:");
+        String licensePlate = scannerString.nextLine();
+        car = carRepository.getCarByLicensePlateWithReservations(licensePlate);
+        if(car == null){
+            System.out.println("Vehicle not in database.");
+            return;
+        }
+        maintenanceList = car.getMaintenances();
+
+        if (maintenanceList.isEmpty()) {
+            System.out.println(car.getLicensePlate() + " does not have a maintenance record");
+            return;
+        }
+        boolean upcomingMaintenanceExists = false;
+        for (Maintenance maintenance : maintenanceList) {
+            if (maintenance.getMaintenanceStart().isAfter(LocalDate.now())) {
+                upcomingMaintenanceExists = true;
+                break;
+            }
+        }
+        if (!upcomingMaintenanceExists) {
+            System.out.println("There are no upcoming maintenances scheduled for " + car.getLicensePlate() + ":");
+            return;
+        }
+
+        System.out.println(car.getLicensePlate() + " has the following upcoming maintenances scheduled: ");
+        for (Maintenance maintenance : maintenanceList) {
+            if (maintenance.getMaintenanceStart().isAfter(LocalDate.now())) {
+                System.out.printf("\n%-4s  |  %-10s |  %-10s  |  %-30s%n", "ID", "From", "To", "Maintenance Details");
+                System.out.printf("%-4s  |  %-10s |  %-10s  |  %-30s%n", maintenance.getId(), maintenance.getMaintenanceStart(), maintenance.getMaintenanceEnd(), maintenance.getMaintenanceDetails());
+            }
+        }
+
+        System.out.println("\nPlease enter the id of the maintenance you would like to cancel:");
+        int idForCancel = scannerInt.nextInt();
+
+        Maintenance maintenanceToBeCanceled = maintenanceRepository.getMaintenanceByID(idForCancel);
+        if(maintenanceToBeCanceled != null){
+            maintenanceRepository.deleteMaintenance(maintenanceToBeCanceled);
+            maintenanceList.remove(maintenanceToBeCanceled);
+            car.setMaintenances(maintenanceList);
+            carRepository.updateCar(car);
+            System.out.println("Maintenance record successfully removed.");
+        } else {
+            System.out.println("No maintenance with that ID was found.");
         }
     }
 

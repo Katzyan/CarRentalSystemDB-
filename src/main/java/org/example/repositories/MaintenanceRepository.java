@@ -3,6 +3,7 @@ package org.example.repositories;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.entities.Car;
 import org.example.entities.Maintenance;
 import org.example.util.HibernateUtil;
 import org.hibernate.Session;
@@ -57,6 +58,15 @@ public class MaintenanceRepository {
         return maintenancesList;
     }
 
+    public void deleteMaintenance(Maintenance maintenance) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        session.delete(maintenance);
+
+        session.getTransaction().commit();
+        session.close();
+    }
 
 
 }

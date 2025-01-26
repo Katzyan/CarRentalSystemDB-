@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="View all maintenance added">
+    <list default="true" id="72a43b8e-259b-44a7-a9a8-337d5a75ee7a" name="Changes" comment="show upcoming maintenance">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repositories/MaintenanceRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +136,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737805613621</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="show upcoming maintenance">
+      <option name="closed" value="true" />
+      <created>1737811656148</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737811656148</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -146,7 +155,8 @@
     <MESSAGE value="adding maintenance records" />
     <MESSAGE value="Maitenance add based on availability&#10;Reservation add based on availability of the Maitenance as well" />
     <MESSAGE value="View all maintenance added" />
-    <option name="LAST_COMMIT_MESSAGE" value="View all maintenance added" />
+    <MESSAGE value="show upcoming maintenance" />
+    <option name="LAST_COMMIT_MESSAGE" value="show upcoming maintenance" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
