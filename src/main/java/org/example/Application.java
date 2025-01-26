@@ -993,8 +993,8 @@ public class Application {
      */
     public static void viewAccountsDB() {
         Scanner scannerInt = new Scanner(System.in);
-        System.out.println("View: ");
-        System.out.println("1. All accounts\n2. Admin accounts\n3. User Accounts");
+        System.out.println("Admin Menu / Accounts / View: ");
+        System.out.println("1. All accounts\n2. Admin accounts\n3. User Accounts\n4. Back\n\n0. Exit");
         int viewAccountsOption = scannerInt.nextInt();
         AccountsRepository accountsRepository = new AccountsRepository();
         switch (viewAccountsOption) {
@@ -1010,14 +1010,18 @@ public class Application {
                 accountsTableHeader();
                 accountsRepository.getUserAccounts().stream().forEach(acc -> acc.viewAllAccounts());
                 break;
-            // RESUME FROM HERE
+            case 4:
+                break;
+            case 0:
+                System.exit(0);
         }
     }
 
     public static void addAccountsDB() {
         Scanner scannerInt = new Scanner(System.in);
         System.out.println("Would you like to add an admin or user?");
-        System.out.println("1. Admin       2. User ");
+        System.out.println("1. Admin       2. User \n" +
+                           "3. Back        0. Exit ");
         int adminOrUser = scannerInt.nextInt();
         switch (adminOrUser) {
             case 1:
@@ -1026,6 +1030,10 @@ public class Application {
             case 2:
                 addAccount(false);
                 break;
+            case 3:
+                break;
+            case 0:
+                System.exit(0);
             default:
                 System.out.println("Invalid option");
 
